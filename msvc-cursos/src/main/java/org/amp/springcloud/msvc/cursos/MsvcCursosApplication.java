@@ -1,13 +1,13 @@
-package org.amp.springcloud.msvc.users;
+package org.amp.springcloud.msvc.cursos;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MsvcUsersApplication {
+public class MsvcCursosApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MsvcUsersApplication.class, args);
+		SpringApplication.run(MsvcCursosApplication.class, args);
 	}
 
 }

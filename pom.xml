@@ -23,6 +23,7 @@
     <!-- agregamos los modulos -->
     <modules>
         <module>msvc-users</module>
+        <module>msvc-cursos</module>
     </modules>
 
     <properties>
