@@ -1,4 +1,4 @@
-package org.amp.springcloud.msvc.users.shared.infrastructure.documentation.openapi.configuration;
+package org.amp.springcloud.msvc.cursos.shared.infrastructure.documentation.openapi.configuration;
 
 import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -15,13 +15,13 @@ public class OpenApiConfiguration {
         var openApi = new OpenAPI();
         openApi
                 .info(new Info()
-                        .title("Courses API")
-                        .description("Microservice Courses.")
+                        .title("Users API")
+                        .description("Microservice Users.")
                         .version("v1.0.0")
                         .license(new License().name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
                 .externalDocs(new ExternalDocumentation()
-                        .description("Courses Platform Wiki Documentation")
+                        .description("ACME Learning Platform Wiki Documentation")
                         .url("https://acme-learning-platform.wiki.github.io/docs"));
 
         return openApi;
