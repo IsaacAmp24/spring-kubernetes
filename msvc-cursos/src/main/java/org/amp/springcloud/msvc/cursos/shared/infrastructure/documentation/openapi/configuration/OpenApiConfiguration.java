@@ -15,13 +15,13 @@ public class OpenApiConfiguration {
         var openApi = new OpenAPI();
         openApi
                 .info(new Info()
-                        .title("Users API")
-                        .description("Microservice Users.")
+                        .title("Courses API")
+                        .description("Microservice Courses.")
                         .version("v1.0.0")
                         .license(new License().name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
                 .externalDocs(new ExternalDocumentation()
-                        .description("ACME Learning Platform Wiki Documentation")
+                        .description("Courses Platform Wiki Documentation")
                         .url("https://acme-learning-platform.wiki.github.io/docs"));
 
         return openApi;
