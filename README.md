@@ -6,5 +6,3 @@ This project is a simple example of how to create a microservices architecture u
 ### Microservices
 
 - Microservices Users.
-
-PROBANDO EL TECLADO DE MI COMPUTADORA XXHJ
