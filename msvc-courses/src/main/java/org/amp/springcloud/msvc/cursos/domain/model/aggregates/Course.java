@@ -1,13 +1,13 @@
 package org.amp.springcloud.msvc.cursos.domain.model.aggregates;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
+import org.amp.springcloud.msvc.cursos.domain.model.entities.CourseUsers;
 import org.amp.springcloud.msvc.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -23,7 +23,8 @@ public class Course extends AuditableAbstractAggregateRoot<Course> {
     @NotEmpty(message = "The field description is required")
     private String description;
 
-    //private String users;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) //
+    private List<CourseUsers> courseUsers; // un curso puede tener varios usuarios
 
     public Course() {
     }
