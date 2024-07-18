@@ -7,7 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
-import org.amp.springcloud.msvc.cursos.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import org.amp.springcloud.msvc.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
 @Entity
 @Getter
