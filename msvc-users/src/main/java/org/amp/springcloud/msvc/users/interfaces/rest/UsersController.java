@@ -1,8 +1,19 @@
 package org.amp.springcloud.msvc.users.interfaces.rest;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.amp.springcloud.msvc.users.domain.model.aggregates.Users;
-import org.amp.springcloud.msvc.users.domain.services.UserService;
+import org.amp.springcloud.msvc.users.domain.model.commands.DeleteUserCommand;
+import org.amp.springcloud.msvc.users.domain.model.commands.UpdateNameUserCommand;
+import org.amp.springcloud.msvc.users.domain.model.queries.GetAllUsersQuery;
+import org.amp.springcloud.msvc.users.domain.model.queries.GetUserByIdQuery;
+import org.amp.springcloud.msvc.users.domain.services.UserCommandService;
+import org.amp.springcloud.msvc.users.domain.services.UserQueryService;
+import org.amp.springcloud.msvc.users.interfaces.rest.resources.CreateUserResource;
+import org.amp.springcloud.msvc.users.interfaces.rest.resources.UpdateNameUserResource;
+import org.amp.springcloud.msvc.users.interfaces.rest.resources.UserResource;
+import org.amp.springcloud.msvc.users.interfaces.rest.transform.CreateUserResourceCommandFromResourceAssembler;
+import org.amp.springcloud.msvc.users.interfaces.rest.transform.UserResourceFromEntityAssembler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -18,49 +30,75 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/api/users", produces = APPLICATION_JSON_VALUE)
 public class UsersController {
 
+    private final UserCommandService userCommandService;
+    private final UserQueryService userQueryService;
+
     @Autowired
-    private UserService userService;
-
-    @GetMapping
-    public List<Users> findAll() {
-        return userService.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Users> findById(@PathVariable Long id) {
-        Optional<Users> user = userService.findById(id);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public UsersController(UserCommandService userCommandService, UserQueryService userQueryService) {
+        this.userCommandService = userCommandService;
+        this.userQueryService = userQueryService;
     }
 
     @PostMapping
-    //@ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Users> save(@RequestBody Users user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.save(user));
+    public ResponseEntity<UserResource> createUser(@Valid @RequestBody CreateUserResource createUserResource) {
+        var createUserCommand = CreateUserResourceCommandFromResourceAssembler.toCommandFromResource(createUserResource);
+        var userId = userCommandService.handle(createUserCommand);
+
+        return userQueryService.handle(new GetUserByIdQuery(userId))
+                .map(userEntity -> new ResponseEntity<>
+                        (UserResourceFromEntityAssembler.toResourceFromEntity(userEntity),
+                                HttpStatus.CREATED))
+
+                .orElse(ResponseEntity.badRequest().build());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Users> update(@PathVariable Long id, @RequestBody Users user) {
-        Optional<Users> existingUser = userService.findById(id);
-        if (existingUser.isPresent()) {
-            Users usersData = existingUser.get();
-            usersData.setName(user.getName());
-            usersData.setEmail(user.getEmail());
-            usersData.setPassword(user.getPassword());
+    @GetMapping
+    public ResponseEntity<List<UserResource>> getAllUsers() {
+        var getAllUsersQuery = new GetAllUsersQuery();
+        var users = userQueryService.handle(getAllUsersQuery);
 
-            return ResponseEntity.ok(userService.save(usersData));
+        var userResources = users.stream()
+                .map(UserResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return new ResponseEntity<>(userResources, HttpStatus.OK);
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResource> getUserById(@PathVariable Long userId) {
+        var getUserByIdQuery = new GetUserByIdQuery(userId);
+        var user = userQueryService.handle(getUserByIdQuery);
+
+        return user.map(userEntity -> ResponseEntity.ok(
+                        UserResourceFromEntityAssembler.toResourceFromEntity(userEntity)))
+                .orElse(ResponseEntity.notFound()
+                        .header("message", "User with ID " + userId + " not found")
+                        .build());
+    }
+
+
+    @PatchMapping("/{userId}/name")
+    public ResponseEntity<UserResource> updateNameUser(
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateNameUserResource updateNameUserResource) {
+
+        var updateNameUserCommand = new UpdateNameUserCommand(userId, updateNameUserResource.name());
+        Optional<Users> updatedUser = userCommandService.handle(updateNameUserCommand);
+
+        if (updatedUser.isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.notFound().build();
+
+        UserResource userResource = UserResourceFromEntityAssembler.toResourceFromEntity(updatedUser.get());
+        return ResponseEntity.ok(userResource);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Users> deleteById(@PathVariable Long id) {
-        Optional<Users> user = userService.findById(id);
+                                                       @DeleteMapping("/{userId}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
+        var deleteUserCommand = new DeleteUserCommand(userId);
+        userCommandService.handle(deleteUserCommand);
 
-        if (user.isPresent()) {
-            userService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok("User with id " + userId + " deleted successfully");
     }
+
 }
