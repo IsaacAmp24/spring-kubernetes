@@ -42,6 +42,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     @Override
+    @Transactional
     public Optional<Users> handle(UpdateNameUserCommand command) {
         Optional<Users> usersOptional = userRepository.findById(command.userId());
 
@@ -57,6 +58,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     @Override
+    @Transactional
     public void handle(DeleteUserCommand command) {
         if (!userRepository.existsById(command.userId())) {
             throw new IllegalArgumentException("User with id " + command.userId() + " does not exist");
