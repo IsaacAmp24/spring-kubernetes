@@ -7,11 +7,12 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
+import org.amp.springcloud.msvc.cursos.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
 @Entity
 @Getter
 @Setter
-public class Course {
+public class Course extends AuditableAbstractAggregateRoot<Course> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,5 +20,16 @@ public class Course {
     @NotEmpty(message = "The field name is required")
     private String name;
 
+    @NotEmpty(message = "The field description is required")
+    private String description;
+
     //private String users;
+
+    public Course() {
+    }
+
+    public Course(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }
