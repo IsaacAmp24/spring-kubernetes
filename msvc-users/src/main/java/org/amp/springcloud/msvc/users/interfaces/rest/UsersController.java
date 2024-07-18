@@ -93,7 +93,7 @@ public class UsersController {
         return ResponseEntity.ok(userResource);
     }
 
-                                                       @DeleteMapping("/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
         var deleteUserCommand = new DeleteUserCommand(userId);
         userCommandService.handle(deleteUserCommand);
