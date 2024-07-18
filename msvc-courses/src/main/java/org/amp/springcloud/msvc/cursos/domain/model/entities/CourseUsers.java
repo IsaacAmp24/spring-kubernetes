@@ -1,9 +1,6 @@
 package org.amp.springcloud.msvc.cursos.domain.model.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.amp.springcloud.msvc.shared.domain.model.entities.AuditableModel;
@@ -18,7 +15,20 @@ public class CourseUsers extends AuditableModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
+    @Column(name = "course_id", unique = true) // no puede haber el mismo alumno en el mismo curso
     private Long userId;
 
+    // este campo se encarga de relacionar el curso con el usuario
+    @Override
+    public boolean equals(Object obj) {
+        // validamos si el objeto es el mismo
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof CourseUsers)) {
+            return false;
+        }
+        CourseUsers courseUsers = (CourseUsers) obj;
+        return userId != null && userId.equals(courseUsers.userId); // comparamos si el usuario es el mismo
+    }
 }
