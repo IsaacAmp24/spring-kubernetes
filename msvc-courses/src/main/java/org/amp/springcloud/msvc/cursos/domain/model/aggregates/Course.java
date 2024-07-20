@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import org.amp.springcloud.msvc.cursos.domain.model.entities.CourseUsers;
-import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.UserResource;
+import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.UserDTO;
 import org.amp.springcloud.msvc.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 
 import java.util.ArrayList;
@@ -29,12 +29,12 @@ public class Course extends AuditableAbstractAggregateRoot<Course> {
     @JoinColumn(name = "course_id") // nombre de la columna que se encarga de relacionar el curso con el usuario
     private List<CourseUsers> courseUsers; // un curso puede tener varios usuarios
 
-    @Transient
-    private List<UserResource> userResources;
+    @Transient // este campo no se va a persistir en la base de datos
+    private List<UserDTO> userDTOS;
 
     public Course() {
         courseUsers = new ArrayList<>(); // inicializamos la lista de cursosUsuarios
-        userResources = new ArrayList<>(); // inicializamos la lista de usuarios
+        userDTOS = new ArrayList<>(); // inicializamos la lista de usuarios
     }
 
     public Course(String name, String description) {
