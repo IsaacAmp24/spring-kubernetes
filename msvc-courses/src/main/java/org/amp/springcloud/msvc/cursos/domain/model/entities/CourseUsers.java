@@ -15,7 +15,7 @@ public class CourseUsers extends AuditableModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "course_id", unique = true) // no puede haber el mismo alumno en el mismo curso
+    @Column(name = "user_id", unique = true) //
     private Long userId;
 
     // este campo se encarga de relacionar el curso con el usuario
