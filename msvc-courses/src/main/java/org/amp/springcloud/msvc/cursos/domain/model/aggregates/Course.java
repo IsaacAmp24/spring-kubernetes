@@ -25,7 +25,7 @@ public class Course extends AuditableAbstractAggregateRoot<Course> {
     @NotEmpty(message = "The field description is required")
     private String description;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) //
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id") // nombre de la columna que se encarga de relacionar el curso con el usuario
     private List<CourseUsers> courseUsers; // un curso puede tener varios usuarios
 
