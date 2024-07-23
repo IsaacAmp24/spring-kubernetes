@@ -1,5 +1,6 @@
 package org.amp.springcloud.msvc.shared.domain.model.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -15,11 +16,13 @@ import java.util.Date;
 public abstract class AuditableModel {
     @Getter
     @CreatedDate
+    @JsonIgnore
     @Column(nullable = false, updatable = false)
     private Date createdAt;
 
     @Getter
     @LastModifiedDate
+    @JsonIgnore
     @Column(nullable = false)
     private Date updatedAt;
 }

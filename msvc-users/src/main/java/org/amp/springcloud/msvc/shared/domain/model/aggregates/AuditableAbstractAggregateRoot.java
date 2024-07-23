@@ -1,5 +1,6 @@
 package org.amp.springcloud.msvc.shared.domain.model.aggregates;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
@@ -20,11 +21,13 @@ public abstract class AuditableAbstractAggregateRoot<T extends AbstractAggregate
 
     @Getter
     @CreatedDate
+    @JsonIgnore
     @Column(nullable = false, updatable = false)
     private Date createdAt;
 
     @Getter
     @LastModifiedDate
+    @JsonIgnore
     @Column(nullable = false)
     private Date updatedAt;
 
