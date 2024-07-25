@@ -13,4 +13,6 @@ public interface CourseUserService {
     Optional<UserDTO> unassignUserToCourse(UserDTO userId, Long courseId);
     Optional<Course> getAllUsersByCourse(Long courseId);
 
+    // eliminar un usuario de todos los cursos
+    void deleteUserFromAllCourses(Long userId);
 }

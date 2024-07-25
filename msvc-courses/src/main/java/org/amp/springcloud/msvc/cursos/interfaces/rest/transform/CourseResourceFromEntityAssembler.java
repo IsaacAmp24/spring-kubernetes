@@ -8,7 +8,9 @@ public class CourseResourceFromEntityAssembler {
         return new CourseResource(
                 course.getId(),
                 course.getName(),
-                course.getDescription()
+                course.getDescription(),
+                course.getUserDTOS(),
+                course.getCourseUsers()
         );
     }
 }

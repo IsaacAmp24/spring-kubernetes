@@ -6,6 +6,7 @@ import org.amp.springcloud.msvc.users.domain.model.commands.DeleteUserCommand;
 import org.amp.springcloud.msvc.users.domain.model.commands.UpdateNameUserCommand;
 import org.amp.springcloud.msvc.users.domain.model.valueobjects.EmailAddress;
 import org.amp.springcloud.msvc.users.domain.services.UserCommandService;
+import org.amp.springcloud.msvc.users.infrastructure.clients.CourseClientRest;
 import org.amp.springcloud.msvc.users.infrastructure.persistence.jpa.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,11 +16,16 @@ import java.util.Optional;
 @Service
 public class UserCommandServiceImpl implements UserCommandService {
 
+    @Autowired
     private final UserRepository userRepository;
 
     @Autowired
-    public UserCommandServiceImpl(UserRepository userRepository) {
+    private final CourseClientRest courseClientRest;
+
+
+    public UserCommandServiceImpl(UserRepository userRepository, CourseClientRest courseClientRest) {
         this.userRepository = userRepository;
+        this.courseClientRest = courseClientRest;
     }
 
     @Override
@@ -68,5 +74,7 @@ public class UserCommandServiceImpl implements UserCommandService {
         } catch (Exception e) {
             throw new IllegalArgumentException("Error deleting user with id " + command.userId());
         }
+        // tambien tenemos que eliminar el usuario de los cursos (si esta asignado a alguno) - inyectamos el cliente de cursos
+        courseClientRest.deleteUserFromCourse(command.userId());
     }
 }

@@ -5,11 +5,13 @@ import org.amp.springcloud.msvc.cursos.domain.model.entities.CourseUsers;
 import org.amp.springcloud.msvc.cursos.domain.services.CourseUserService;
 import org.amp.springcloud.msvc.cursos.infrastructure.clients.UserClientRest;
 import org.amp.springcloud.msvc.cursos.infrastructure.persistence.jpa.repositories.CourseRepository;
+import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.CreateUserDTO;
 import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -47,11 +49,11 @@ public class CourseUserServiceImpl implements CourseUserService {
 
     @Override
     @Transactional
-    public Optional<UserDTO> createUserByCourse(UserDTO userId, Long courseId) {
+    public Optional<CreateUserDTO> createUserByCourse(CreateUserDTO createUserDTO, Long courseId) {
          var course = courseRepository.findById(courseId);
 
-            if (course.isPresent() && userId != null) {
-                UserDTO userDTO = userClientRest.createUser(userId);
+            if (course.isPresent() && createUserDTO != null) {
+                UserDTO userDTO = userClientRest.createUser(createUserDTO);
                 Course course1 = course.get();
                 CourseUsers courseUsers = new CourseUsers();
                 courseUsers.setUserId(userDTO.id());
@@ -59,7 +61,7 @@ public class CourseUserServiceImpl implements CourseUserService {
                 course1.addCourseUser(courseUsers);
                 courseRepository.save(course1);
 
-                return Optional.of(userDTO);
+                return Optional.of(createUserDTO);
             }
             return Optional.empty();
     }
@@ -82,4 +84,33 @@ public class CourseUserServiceImpl implements CourseUserService {
         }
         return Optional.empty();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Course> getAllUsersByCourse(Long courseId) {
+        var courseRepositoryById = courseRepository.findById(courseId);
+
+        if (courseRepositoryById.isPresent()) {
+            Course course = courseRepositoryById.get();
+             if (!course.getCourseUsers().isEmpty()) {
+                 // aqui obtenemos la lista de ids de los usuarios del curso
+                 List<Long> userIds = course.getCourseUsers().stream().map(CourseUsers::getUserId).toList();
+
+                 // aqui obtenemos la lista de usuarios por su id
+                 List<UserDTO> userDTOS = userClientRest.getAllUsersByCourse(userIds);
+                 course.setUserDTOS(userDTOS);
+             }
+            return Optional.of(course);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserFromAllCourses(Long userId) {
+        courseRepository.deleteCourseUserByUserId(userId);
+        userClientRest.deleteUser(userId);
+    }
+
+
 }

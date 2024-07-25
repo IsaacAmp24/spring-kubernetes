@@ -1,13 +1,17 @@
 package org.amp.springcloud.msvc.cursos.domain.model.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.amp.springcloud.msvc.shared.domain.model.entities.AuditableModel;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 // tabla que se encarga de relacionar los cursos con los usuarios
 public class CourseUsers extends AuditableModel {
 

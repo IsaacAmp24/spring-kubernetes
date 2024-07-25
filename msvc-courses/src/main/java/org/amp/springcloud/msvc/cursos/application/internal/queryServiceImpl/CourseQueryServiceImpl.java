@@ -14,9 +14,9 @@ import java.util.Optional;
 @Service
 public class CourseQueryServiceImpl implements CourseQueryService {
 
+    @Autowired
     private final CourseRepository courseRepository;
 
-    @Autowired
     public CourseQueryServiceImpl(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }

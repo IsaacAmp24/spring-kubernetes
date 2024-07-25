@@ -1,6 +1,7 @@
 package org.amp.springcloud.msvc.users.application.internal.queryServiceImpl;
 
 import org.amp.springcloud.msvc.users.domain.model.aggregates.Users;
+import org.amp.springcloud.msvc.users.domain.model.queries.GetAllUsersByIdQuery;
 import org.amp.springcloud.msvc.users.domain.model.queries.GetAllUsersQuery;
 import org.amp.springcloud.msvc.users.domain.model.queries.GetUserByIdQuery;
 import org.amp.springcloud.msvc.users.domain.services.UserQueryService;
@@ -26,5 +27,10 @@ public class UserQueryServiceImpl implements UserQueryService{
     @Override
     public Optional<Users> handle(GetUserByIdQuery query) {
         return userRepository.findById(query.id());
+    }
+
+    @Override
+    public List<Users> handle(GetAllUsersByIdQuery query) {
+        return userRepository.findAllById(query.ids());
     }
 }

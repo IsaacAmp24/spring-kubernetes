@@ -16,9 +16,9 @@ import java.util.Optional;
 @Service
 public class CourseCommandServiceImpl implements CourseCommandService {
 
+    @Autowired
     private final CourseRepository courseRepository;
 
-    @Autowired
     public CourseCommandServiceImpl(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
     }

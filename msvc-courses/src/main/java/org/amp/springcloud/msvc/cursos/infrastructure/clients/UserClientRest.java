@@ -1,11 +1,11 @@
 package org.amp.springcloud.msvc.cursos.infrastructure.clients;
 
+import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.CreateUserDTO;
 import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.UserDTO;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @FeignClient(name = "msvc-users", url = "http://localhost:8001")
 public interface UserClientRest {
@@ -16,6 +16,16 @@ public interface UserClientRest {
 
     // creamos un usuario en base a un UserDTO - [createUser] tiene que ser el mismo en UsersController
     @PostMapping("/api/users")
-    public UserDTO createUser(@RequestBody UserDTO userDTO);
+    public UserDTO createUser(@RequestBody CreateUserDTO userDTO);
+
+    // obtenemos lista de usuarios por su id
+    @GetMapping("/api/users/all")
+    List<UserDTO> getAllUsersByCourse(@RequestParam Iterable<Long> ids);
+
+
+    // eliminamos un usuario por su id
+    @DeleteMapping("/api/users/{userId}")
+    void deleteUser(@PathVariable Long userId);
+
 
 }

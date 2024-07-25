@@ -1,5 +1,6 @@
 package org.amp.springcloud.msvc.cursos.interfaces.rest;
 
+import feign.FeignException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.amp.springcloud.msvc.cursos.domain.model.aggregates.Course;
@@ -10,20 +11,16 @@ import org.amp.springcloud.msvc.cursos.domain.model.queries.GetAllCoursesQuery;
 import org.amp.springcloud.msvc.cursos.domain.model.queries.GetCourseByIdQuery;
 import org.amp.springcloud.msvc.cursos.domain.services.CourseCommandService;
 import org.amp.springcloud.msvc.cursos.domain.services.CourseQueryService;
-import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.CourseResource;
-import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.CreateCourseResource;
-import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.UpdateDescriptionCourseResource;
-import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.UpdateNameCourseResource;
+import org.amp.springcloud.msvc.cursos.domain.services.CourseUserService;
+import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.*;
 import org.amp.springcloud.msvc.cursos.interfaces.rest.transform.CourseResourceFromEntityAssembler;
 import org.amp.springcloud.msvc.cursos.interfaces.rest.transform.CreateCourseResourceCommandFromResourceAssembler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -33,13 +30,16 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 @RequestMapping( value = "/api/courses", produces = APPLICATION_JSON_VALUE)
 public class CoursesController {
 
+    
     private final CourseCommandService courseCommandService;
     private final CourseQueryService courseQueryService;
+    private final CourseUserService courseUserService;
 
-    @Autowired
-    public CoursesController(CourseCommandService courseCommandService, CourseQueryService courseQueryService) {
+    
+    public CoursesController(CourseCommandService courseCommandService, CourseQueryService courseQueryService, CourseUserService courseUserService) {
         this.courseCommandService = courseCommandService;
         this.courseQueryService = courseQueryService;
+        this.courseUserService = courseUserService;
     }
 
     @GetMapping
@@ -127,6 +127,80 @@ public class CoursesController {
         return ResponseEntity.ok("Course with id " + courseId + " deleted successfully");
     }
 
+    // metodos nuevos para la comunicacion con el servicio de alumnos
 
+    // asignar un alumno a un curso
+    @PutMapping("/assign-student/{courseId}")
+    public ResponseEntity<?> assignUserToCourse(@RequestBody UserDTO userDTO, @PathVariable Long courseId) {
+
+        Optional<UserDTO> user;
+
+        try {
+            user = courseUserService.assignUserToCourse(userDTO, courseId);
+        } catch (FeignException e) {
+            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body("No se encontro el usuario para asignarlo al curso" + "Message: " + e.getMessage());
+        }
+
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+
+    }
+
+    // crear un usuario para un curso
+    @PostMapping("/create-user/{courseId}")
+    public ResponseEntity<?> createUserForCourse(@RequestBody CreateUserDTO createUserDTO, @PathVariable Long courseId) {
+
+        Optional<CreateUserDTO> user;
+
+        try {
+            user = courseUserService.createUserByCourse(createUserDTO, courseId);
+        } catch (FeignException e) {
+            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body("No se pudo crear el usuario" + "Message: " + e.getMessage());
+        }
+
+        if (user.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se pudo crear el usuario");
+        }
+
+    }
+
+    // desasignamos un usuario de un curso
+    @DeleteMapping("/unassign-student/{courseId}")
+    public ResponseEntity<?> deleteUserFromCourse(@RequestBody UserDTO userDTO, @PathVariable Long courseId) {
+
+        Optional<UserDTO> user;
+
+        try {
+            user = courseUserService.unassignUserToCourse(userDTO, courseId);
+        } catch (FeignException e) {
+            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body("No se encontro el usuario para eliminarlo del curso; " + "Message: " + e.getMessage());
+        }
+
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+
+    }
+
+    // obtener todos los usuarios de un curso
+    @GetMapping("/all-users/{courseId}")
+    public ResponseEntity<?> getAllUsersByCourse(@PathVariable Long courseId) {
+        Optional<Course> course;
+
+        try {
+            course = courseUserService.getAllUsersByCourse(courseId);
+        } catch (FeignException e) {
+            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body("No se encontro el curso; " + "Message: " + e.getMessage());
+        }
+
+        return course.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // eliminamos el usuario de un curso
+    @DeleteMapping("/delete-user-from-course/{userId}")
+    public ResponseEntity<?> deleteUserFromCourse(@PathVariable("id") Long userId) {
+        courseUserService.deleteUserFromAllCourses(userId);
+        return ResponseEntity.ok("User with id " + userId + " deleted successfully");
+    }
 
 }

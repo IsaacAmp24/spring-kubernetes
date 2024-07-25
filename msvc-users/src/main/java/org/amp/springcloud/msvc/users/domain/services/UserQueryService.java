@@ -1,6 +1,7 @@
 package org.amp.springcloud.msvc.users.domain.services;
 
 import org.amp.springcloud.msvc.users.domain.model.aggregates.Users;
+import org.amp.springcloud.msvc.users.domain.model.queries.GetAllUsersByIdQuery;
 import org.amp.springcloud.msvc.users.domain.model.queries.GetAllUsersQuery;
 import org.amp.springcloud.msvc.users.domain.model.queries.GetUserByIdQuery;
 
@@ -13,5 +14,8 @@ public interface UserQueryService {
 
     // obtiene un usuario por su id
     Optional<Users> handle(GetUserByIdQuery query);
+
+    // obtiene todos los usuarios por su id
+    List<Users> handle(GetAllUsersByIdQuery query);
 
 }
