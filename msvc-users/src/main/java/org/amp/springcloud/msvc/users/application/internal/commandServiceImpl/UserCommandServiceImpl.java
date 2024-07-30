@@ -2,7 +2,6 @@ package org.amp.springcloud.msvc.users.application.internal.commandServiceImpl;
 
 import org.amp.springcloud.msvc.users.domain.model.aggregates.Users;
 import org.amp.springcloud.msvc.users.domain.model.commands.CreateUserCommand;
-import org.amp.springcloud.msvc.users.domain.model.commands.DeleteUserCommand;
 import org.amp.springcloud.msvc.users.domain.model.commands.UpdateNameUserCommand;
 import org.amp.springcloud.msvc.users.domain.model.valueobjects.EmailAddress;
 import org.amp.springcloud.msvc.users.domain.services.UserCommandService;
@@ -65,16 +64,8 @@ public class UserCommandServiceImpl implements UserCommandService {
 
     @Override
     @Transactional
-    public void handle(DeleteUserCommand command) {
-        if (!userRepository.existsById(command.userId())) {
-            throw new IllegalArgumentException("User with id " + command.userId() + " does not exist");
-        }
-        try {
-            userRepository.deleteById(command.userId());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Error deleting user with id " + command.userId());
-        }
-        // tambien tenemos que eliminar el usuario de los cursos (si esta asignado a alguno) - inyectamos el cliente de cursos
-        courseClientRest.deleteUserFromCourse(command.userId());
+    public void deleteUsers(Long userId) {
+        courseClientRest.unassignUserFromCourses(userId);
+        userRepository.deleteById(userId);
     }
 }

@@ -7,25 +7,22 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "msvc-users", url = "http://localhost:8001")
+@FeignClient(name = "msvc-users", url = "http://localhost:8001/api/users", fallback = UserClientFallBack.class)
 public interface UserClientRest {
 
     // obtenenmos el usuario por id - [getUserById] tiene que ser el mismo en UserController
-    @GetMapping("/api/users/{userId}")
+    @GetMapping("/{userId}")
     public UserDTO getUserById(@PathVariable Long userId);
 
     // creamos un usuario en base a un UserDTO - [createUser] tiene que ser el mismo en UsersController
-    @PostMapping("/api/users")
+    @PostMapping("")
     public UserDTO createUser(@RequestBody CreateUserDTO userDTO);
 
     // obtenemos lista de usuarios por su id
-    @GetMapping("/api/users/all")
+    @GetMapping("/all")
     List<UserDTO> getAllUsersByCourse(@RequestParam Iterable<Long> ids);
 
-
     // eliminamos un usuario por su id
-    @DeleteMapping("/api/users/{userId}")
+    @DeleteMapping("/{userId}")
     void deleteUser(@PathVariable Long userId);
-
-
 }

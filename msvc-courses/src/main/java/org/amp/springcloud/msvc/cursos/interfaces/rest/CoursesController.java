@@ -12,6 +12,7 @@ import org.amp.springcloud.msvc.cursos.domain.model.queries.GetCourseByIdQuery;
 import org.amp.springcloud.msvc.cursos.domain.services.CourseCommandService;
 import org.amp.springcloud.msvc.cursos.domain.services.CourseQueryService;
 import org.amp.springcloud.msvc.cursos.domain.services.CourseUserService;
+import org.amp.springcloud.msvc.cursos.infrastructure.clients.UserClientRest;
 import org.amp.springcloud.msvc.cursos.interfaces.rest.resources.*;
 import org.amp.springcloud.msvc.cursos.interfaces.rest.transform.CourseResourceFromEntityAssembler;
 import org.amp.springcloud.msvc.cursos.interfaces.rest.transform.CreateCourseResourceCommandFromResourceAssembler;
@@ -34,12 +35,14 @@ public class CoursesController {
     private final CourseCommandService courseCommandService;
     private final CourseQueryService courseQueryService;
     private final CourseUserService courseUserService;
+    private final UserClientRest userClientRest;
 
     
-    public CoursesController(CourseCommandService courseCommandService, CourseQueryService courseQueryService, CourseUserService courseUserService) {
+    public CoursesController(CourseCommandService courseCommandService, CourseQueryService courseQueryService, CourseUserService courseUserService, UserClientRest userClientRest) {
         this.courseCommandService = courseCommandService;
         this.courseQueryService = courseQueryService;
         this.courseUserService = courseUserService;
+        this.userClientRest = userClientRest;
     }
 
     @GetMapping
@@ -167,19 +170,10 @@ public class CoursesController {
     }
 
     // desasignamos un usuario de un curso
-    @DeleteMapping("/unassign-student/{courseId}")
-    public ResponseEntity<?> deleteUserFromCourse(@RequestBody UserDTO userDTO, @PathVariable Long courseId) {
-
-        Optional<UserDTO> user;
-
-        try {
-            user = courseUserService.unassignUserToCourse(userDTO, courseId);
-        } catch (FeignException e) {
-            return ResponseEntity.status((HttpStatus.NOT_FOUND)).body("No se encontro el usuario para eliminarlo del curso; " + "Message: " + e.getMessage());
-        }
-
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-
+    @DeleteMapping("/unassign-student/{userId}")
+    public ResponseEntity<Void> unassignUserFromCourses(@PathVariable Long userId) {
+        courseUserService.unassignUserFromCourse(userId);
+        return ResponseEntity.noContent().build();
     }
 
     // obtener todos los usuarios de un curso
@@ -198,9 +192,9 @@ public class CoursesController {
 
     // eliminamos el usuario de un curso
     @DeleteMapping("/delete-user-from-course/{userId}")
-    public ResponseEntity<?> deleteUserFromCourse(@PathVariable("id") Long userId) {
-        courseUserService.deleteUserFromAllCourses(userId);
-        return ResponseEntity.ok("User with id " + userId + " deleted successfully");
+    public ResponseEntity<?> deleteUserFromCourse(@PathVariable Long userId) {
+        userClientRest.deleteUser(userId);
+        return ResponseEntity.noContent().build();
     }
 
 }

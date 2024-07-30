@@ -1,5 +1,7 @@
 package org.amp.springcloud.msvc.cursos.application.internal.CommunicationServiceImpl;
 
+import feign.FeignException;
+import feign.RetryableException;
 import org.amp.springcloud.msvc.cursos.domain.model.aggregates.Course;
 import org.amp.springcloud.msvc.cursos.domain.model.entities.CourseUsers;
 import org.amp.springcloud.msvc.cursos.domain.services.CourseUserService;
@@ -19,6 +21,7 @@ public class CourseUserServiceImpl implements CourseUserService {
 
     @Autowired
     private final UserClientRest userClientRest;
+    @Autowired
     private final CourseRepository courseRepository;
 
     public CourseUserServiceImpl(UserClientRest userClientRest, CourseRepository courseRepository) {
@@ -66,7 +69,7 @@ public class CourseUserServiceImpl implements CourseUserService {
             return Optional.empty();
     }
 
-    @Override
+    /*@Override
     @Transactional
     public Optional<UserDTO> unassignUserToCourse(UserDTO userId, Long courseId) {
         var course = courseRepository.findById(courseId);
@@ -77,13 +80,13 @@ public class CourseUserServiceImpl implements CourseUserService {
             CourseUsers courseUsers = new CourseUsers();
             courseUsers.setUserId(userDTO.id());
 
-            course1.removeCourseUser(courseUsers);
+            course1.unassignUserFromCourse(courseUsers);
             courseRepository.save(course1);
 
             return Optional.of(userDTO);
         }
         return Optional.empty();
-    }
+    }*/
 
     @Override
     @Transactional(readOnly = true)
@@ -105,12 +108,13 @@ public class CourseUserServiceImpl implements CourseUserService {
         return Optional.empty();
     }
 
+
     @Override
-    @Transactional
-    public void deleteUserFromAllCourses(Long userId) {
-        courseRepository.deleteCourseUserByUserId(userId);
-        userClientRest.deleteUser(userId);
+    public void unassignUserFromCourse(Long userId) {
+        List<Course> courses = courseRepository.findAll();
+        for (Course course : courses) {
+            course.getCourseUsers().removeIf(cu -> cu.getUserId().equals(userId));
+            courseRepository.save(course);
+        }
     }
-
-
 }

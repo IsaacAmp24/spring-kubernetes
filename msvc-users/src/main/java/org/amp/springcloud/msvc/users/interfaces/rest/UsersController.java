@@ -3,13 +3,13 @@ package org.amp.springcloud.msvc.users.interfaces.rest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.amp.springcloud.msvc.users.domain.model.aggregates.Users;
-import org.amp.springcloud.msvc.users.domain.model.commands.DeleteUserCommand;
 import org.amp.springcloud.msvc.users.domain.model.commands.UpdateNameUserCommand;
 import org.amp.springcloud.msvc.users.domain.model.queries.GetAllUsersByIdQuery;
 import org.amp.springcloud.msvc.users.domain.model.queries.GetAllUsersQuery;
 import org.amp.springcloud.msvc.users.domain.model.queries.GetUserByIdQuery;
 import org.amp.springcloud.msvc.users.domain.services.UserCommandService;
 import org.amp.springcloud.msvc.users.domain.services.UserQueryService;
+import org.amp.springcloud.msvc.users.infrastructure.clients.CourseClientRest;
 import org.amp.springcloud.msvc.users.interfaces.rest.resources.CreateUserResource;
 import org.amp.springcloud.msvc.users.interfaces.rest.resources.UpdateNameUserResource;
 import org.amp.springcloud.msvc.users.interfaces.rest.resources.UserResource;
@@ -31,11 +31,13 @@ public class UsersController {
 
     private final UserCommandService userCommandService;
     private final UserQueryService userQueryService;
+    private final CourseClientRest courseClientRest;
 
     
-    public UsersController(UserCommandService userCommandService, UserQueryService userQueryService) {
+    public UsersController(UserCommandService userCommandService, UserQueryService userQueryService, CourseClientRest courseClientRest) {
         this.userCommandService = userCommandService;
         this.userQueryService = userQueryService;
+        this.courseClientRest = courseClientRest;
     }
 
     @PostMapping
@@ -92,14 +94,6 @@ public class UsersController {
         return ResponseEntity.ok(userResource);
     }
 
-    @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-        var deleteUserCommand = new DeleteUserCommand(userId);
-        userCommandService.handle(deleteUserCommand);
-
-        return ResponseEntity.ok("User with id " + userId + " deleted successfully");
-    }
-
     // obtenemos todos los usuarios por su id (lo usaremos en el servicio cursos para obtener cuantos usuarios hay en un curso)
     @GetMapping("/all")
     public ResponseEntity<List<UserResource>> getAllUsersById(@RequestParam List<Long> ids) {
@@ -111,6 +105,14 @@ public class UsersController {
                 .toList();
 
         return new ResponseEntity<>(userResources, HttpStatus.OK);
+    }
+
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        courseClientRest.unassignUserFromCourses(userId);
+        userCommandService.deleteUsers(userId);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -4,10 +4,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "msvc-courses", url = "localhost:8002")
+@FeignClient(name = "msvc-courses", url = "http://localhost:8002/api/courses")
 public interface CourseClientRest {
 
-    @DeleteMapping("/api/courses/delete-user-from-course/{userId}")
-    void deleteUserFromCourse(@PathVariable("id") Long userId);
+    @DeleteMapping("/unassign-student/{userId}")
+    void unassignUserFromCourses(@PathVariable("userId") Long userId);
 
 }

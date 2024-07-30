@@ -13,7 +13,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     boolean existsByName(String name);
 
     // unassigned un usuario de un curso cuando el usuario se elimina del microservicio de usuarios
-    @Query("delete from CourseUsers cu where cu.userId=?1")
     @Modifying
+    @Query("delete from CourseUsers cu where cu.userId=?1")
     void deleteCourseUserByUserId(Long userId);
 }
