@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FeignConfig {
+    @SuppressWarnings("deprecation")
     @Bean
     public Request.Options options() {
         return new Request.Options(10000, 60000);
