@@ -1,7 +1,6 @@
 package org.amp.springcloud.msvc.cursos.application.internal.CommunicationServiceImpl;
 
-import feign.FeignException;
-import feign.RetryableException;
+
 import org.amp.springcloud.msvc.cursos.domain.model.aggregates.Course;
 import org.amp.springcloud.msvc.cursos.domain.model.entities.CourseUsers;
 import org.amp.springcloud.msvc.cursos.domain.services.CourseUserService;
