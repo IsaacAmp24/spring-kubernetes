@@ -34,7 +34,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         // validar si ya existe un usuario con el mismo email
         if (userRepository.existsByEmail(emailAddress)) {
-            throw new IllegalArgumentException("User with email " + command.email() + " already exists");
+            throw new IllegalArgumentException("El usuario con el correo " + command.email() + " ya existe");
         }
 
         var user = new Users(
@@ -53,7 +53,7 @@ public class UserCommandServiceImpl implements UserCommandService {
 
         // validar si el usuario al que se debe actualizar existe
         if (usersOptional.isEmpty()) {
-            throw new IllegalArgumentException("User with id " + command.userId() + " does not exist");
+            throw new IllegalArgumentException("El usuario con el id: " + command.userId() + " no existe");
         }
 
         Users user = usersOptional.get();

@@ -73,7 +73,7 @@ public class UsersController {
         return user.map(userEntity -> ResponseEntity.ok(
                         UserResourceFromEntityAssembler.toResourceFromEntity(userEntity)))
                 .orElse(ResponseEntity.notFound()
-                        .header("message", "User with ID " + userId + " not found")
+                        .header("message", "Usuario con ID " + userId + " no se encontró")
                         .build());
     }
 
