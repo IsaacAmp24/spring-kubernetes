@@ -17,9 +17,12 @@ COPY ./msvc-users/src ./src
 
 RUN ./mvnw clean package -DskipTests
 
+# creamos una nueva imagen con el jre y copiamos el jar generado en la imagen anterior
 FROM alpine/java:21
 
 WORKDIR /app
+
+RUN mkdir ./logs
 
 COPY --from=builder /app/msvc-users/target/msvc-users-0.0.1-SNAPSHOT.jar .
 
