@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "msvc-users", url = "http://localhost:8001/api/users", fallback = UserClientFallBack.class)
+@FeignClient(name = "msvc-users", url = "msvc-users:8001/api/users")
 public interface UserClientRest {
 
     // obtenenmos el usuario por id - [getUserById] tiene que ser el mismo en UserController

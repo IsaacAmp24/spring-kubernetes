@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 // @FeignClient(name = "msvc-courses", url = "http://localhost:8002/api/courses")
 
 // para docker
-@FeignClient(name = "msvc-courses", url = "host.docker.internal:8002/api/courses")
+@FeignClient(name = "msvc-courses", url = "msvc-courses:8002/api/courses")
 public interface CourseClientRest {
 
     @DeleteMapping("/unassign-student/{userId}")
